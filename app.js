@@ -1944,8 +1944,8 @@ app.put("/api/education/:id", verifyEmployee, (req, res) => {
   });
 });
 
-app.delete("/api/education/:id1/:id2", verifyEmployee, (req, res) => {
-  Employee.findById({ _id: req.params.id1 }, function(err, employee) {
+app.delete("/api/education/:id/:id2", verifyEmployee, (req, res) => {
+  Employee.findById({ _id: req.params.id }, function(err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
@@ -1957,7 +1957,7 @@ app.delete("/api/education/:id1/:id2", verifyEmployee, (req, res) => {
         if (!err) {
           console.log("education deleted");
           Employee.update(
-            { _id: req.params.id1 },
+            { _id: req.params.id },
             { $pull: { education: req.params.id2 } },
             function(err, numberAffected) {
               console.log(numberAffected);
@@ -2078,8 +2078,8 @@ app.put("/api/family-info/:id", verifyEmployee, (req, res) => {
   });
 });
 
-app.delete("/api/family-info/:id1/:id2", verifyEmployee, (req, res) => {
-  Employee.findById({ _id: req.params.id1 }, function(err, employee) {
+app.delete("/api/family-info/:id/:id2", verifyEmployee, (req, res) => {
+  Employee.findById({ _id: req.params.id }, function(err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
@@ -2091,7 +2091,7 @@ app.delete("/api/family-info/:id1/:id2", verifyEmployee, (req, res) => {
         if (!err) {
           console.log("FamilyInfo deleted");
           Employee.update(
-            { _id: req.params.id1 },
+            { _id: req.params.id },
             { $pull: { familyInfo: req.params.id2 } },
             function(err, numberAffected) {
               console.log(numberAffected);
@@ -2215,8 +2215,8 @@ app.put("/api/work-experience/:id", verifyEmployee, (req, res) => {
   });
 });
 
-app.delete("/api/Work-experience/:id1/:id2", verifyEmployee, (req, res) => {
-  Employee.findById({ _id: req.params.id1 }, function(err, employee) {
+app.delete("/api/Work-experience/:id/:id2", verifyEmployee, (req, res) => {
+  Employee.findById({ _id: req.params.id }, function(err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
@@ -2228,7 +2228,7 @@ app.delete("/api/Work-experience/:id1/:id2", verifyEmployee, (req, res) => {
         if (!err) {
           console.log("WorkExperience deleted");
           Employee.update(
-            { _id: req.params.id1 },
+            { _id: req.params.id },
             { $pull: { workExperience: req.params.id2 } },
             function(err, numberAffected) {
               console.log(numberAffected);
@@ -2362,10 +2362,10 @@ app.put("/api/leave-application-emp/:id", verifyEmployee, (req, res) => {
 });
 
 app.delete(
-  "/api/leave-application-emp/:id1/:id2",
+  "/api/leave-application-emp/:id/:id2",
   verifyEmployee,
   (req, res) => {
-    Employee.findById({ _id: req.params.id1 }, function(err, employee) {
+    Employee.findById({ _id: req.params.id }, function(err, employee) {
       if (err) {
         res.send("error");
         console.log(err);
@@ -2377,7 +2377,7 @@ app.delete(
           if (!err) {
             console.log("LeaveApplication deleted");
             Employee.update(
-              { _id: req.params.id1 },
+              { _id: req.params.id },
               { $pull: { leaveApplication: req.params.id2 } },
               function(err, numberAffected) {
                 console.log(numberAffected);
@@ -2447,8 +2447,8 @@ app.put("/api/leave-application-hr/:id", verifyHR, (req, res) => {
   });
 });
 
-app.delete("/api/leave-application-hr/:id1/:id2", verifyHR, (req, res) => {
-  Employee.findById({ _id: req.params.id1 }, function(err, employee) {
+app.delete("/api/leave-application-hr/:id/:id2", verifyHR, (req, res) => {
+  Employee.findById({ _id: req.params.id }, function(err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
@@ -2460,7 +2460,7 @@ app.delete("/api/leave-application-hr/:id1/:id2", verifyHR, (req, res) => {
         if (!err) {
           console.log("LeaveApplication deleted");
           Employee.update(
-            { _id: req.params.id1 },
+            { _id: req.params.id },
             { $pull: { leaveApplication: req.params.id2 } },
             function(err, numberAffected) {
               console.log(numberAffected);
@@ -2610,9 +2610,21 @@ function verifyHREmployee(req, res, next) {
         res.sendStatus(403);
       } else {
         console.log(authData);
-        if (authData.Account == 2 || authData.Account == 3) {
+        if (authData.Account == 2) {
           next();
-        } else {
+        } else if(authData.Account == 3){
+          if(authData._id == req.params.id){
+
+
+            next();
+          }
+          else{
+          res.sendStatus(403);
+
+          }
+          
+
+        }else {
           res.sendStatus(403);
         }
       }
@@ -2633,9 +2645,13 @@ function verifyEmployee(req, res, next) {
       if (err) {
         res.sendStatus(403);
       } else {
-        console.log(authData);
-        if (authData.Account == 3) {
-          next();
+        if (authData._id == req.params.id) {
+          console.log(authData);
+          if (authData.Account == 3) {
+            next();
+          } else {
+            res.sendStatus(403);
+          }
         } else {
           res.sendStatus(403);
         }
