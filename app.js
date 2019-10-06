@@ -5,10 +5,22 @@ var express = require("express"),
   app = express();
 jwt = require("jsonwebtoken");
 
-var config = require("./config.js");
-var jwtKey = require("./jwtKey.js");
+//connecting to mongodb
+let mongoURI;
+if (!process.env.DATABASEURL) {
+  var config = require("./config.js");
+  mongoURI = config.DATABASEURL;
+} else {
+  mongoURI = process.env.DATABASEURL;
+}
+//seting up jwt token
+if (!process.env.JWTTOKEN) {
+  var jwtKey = require("./jwtKey.js").jwtKey;
 
-app.use(function(req, res, next) {
+} else {
+  jwtKey = process.env.JWTTOKEN;
+}
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   res.header(
@@ -18,13 +30,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-//connecting to mongodb
-let mongoURI;
-if (!process.env.DATABASEURL) {
-  mongoURI = config.dataurl;
-} else {
-  mongoURI = process.env.DATABASEURL;
-}
+
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
@@ -588,7 +594,7 @@ const CompanyValidation = Joi.object().keys({
 app.get("/api/role", verifyAdminHR, (req, res) => {
   Role.find()
     .populate("company")
-    .exec(function(err, role) {
+    .exec(function (err, role) {
       res.send(role);
     });
 });
@@ -606,7 +612,7 @@ app.post("/api/role", verifyAdminHR, (req, res) => {
         company: req.body.CompanyID
       };
 
-      Role.create(newRole, function(err, role) {
+      Role.create(newRole, function (err, role) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -634,7 +640,7 @@ app.put("/api/role/:id", verifyAdminHR, (req, res) => {
         company: req.body.CompanyID
       };
 
-      Role.findByIdAndUpdate(req.params.id, updateRole, function(err, role) {
+      Role.findByIdAndUpdate(req.params.id, updateRole, function (err, role) {
         if (err) {
           res.send("error");
         } else {
@@ -648,13 +654,13 @@ app.put("/api/role/:id", verifyAdminHR, (req, res) => {
   });
 });
 app.delete("/api/role/:id", verifyAdminHR, (req, res) => {
-  Employee.find({ role: req.params.id }, function(err, r) {
+  Employee.find({ role: req.params.id }, function (err, r) {
     if (err) {
       console.log(err);
       res.send(err);
     } else {
       if (r.length == 0) {
-        Role.findByIdAndRemove({ _id: req.params.id }, function(err, role) {
+        Role.findByIdAndRemove({ _id: req.params.id }, function (err, role) {
           if (!err) {
             console.log(" Role deleted");
             res.send(role);
@@ -678,7 +684,7 @@ app.delete("/api/role/:id", verifyAdminHR, (req, res) => {
 app.get("/api/position", verifyAdminHR, (req, res) => {
   Position.find()
     .populate("company")
-    .exec(function(err, role) {
+    .exec(function (err, role) {
       res.send(role);
     });
 });
@@ -696,7 +702,7 @@ app.post("/api/position", verifyAdminHR, (req, res) => {
         company: req.body.CompanyID
       };
 
-      Position.create(newPosition, function(err, position) {
+      Position.create(newPosition, function (err, position) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -722,7 +728,7 @@ app.put("/api/position/:id", verifyAdminHR, (req, res) => {
         company: req.body.CompanyID
       };
 
-      Position.findByIdAndUpdate(req.params.id, updatePosition, function(
+      Position.findByIdAndUpdate(req.params.id, updatePosition, function (
         err,
         position
       ) {
@@ -740,13 +746,13 @@ app.put("/api/position/:id", verifyAdminHR, (req, res) => {
 });
 
 app.delete("/api/position/:id", verifyAdminHR, (req, res) => {
-  Employee.find({ position: req.params.id }, function(err, p) {
+  Employee.find({ position: req.params.id }, function (err, p) {
     if (err) {
       console.log(err);
       res.send(err);
     } else {
       if (p.length == 0) {
-        Position.findByIdAndRemove({ _id: req.params.id }, function(
+        Position.findByIdAndRemove({ _id: req.params.id }, function (
           err,
           position
         ) {
@@ -777,7 +783,7 @@ app.delete("/api/position/:id", verifyAdminHR, (req, res) => {
 app.get("/api/department", verifyAdminHR, (req, res) => {
   Department.find()
     .populate("company")
-    .exec(function(err, employees) {
+    .exec(function (err, employees) {
       res.send(employees);
     });
 });
@@ -794,7 +800,7 @@ app.post("/api/department", verifyAdminHR, (req, res) => {
         company: req.body.CompanyID
       };
 
-      Department.create(newDepartment, function(err, department) {
+      Department.create(newDepartment, function (err, department) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -820,7 +826,7 @@ app.put("/api/department/:id", verifyAdminHR, (req, res) => {
         company: req.body.CompanyID
       };
 
-      Department.findByIdAndUpdate(req.params.id, updateDepartment, function(
+      Department.findByIdAndUpdate(req.params.id, updateDepartment, function (
         err,
         department
       ) {
@@ -838,13 +844,13 @@ app.put("/api/department/:id", verifyAdminHR, (req, res) => {
 });
 
 app.delete("/api/department/:id", verifyAdminHR, (req, res) => {
-  Employee.find({ department: req.params.id }, function(err, d) {
+  Employee.find({ department: req.params.id }, function (err, d) {
     if (err) {
       console.log(err);
       res.send(err);
     } else {
       if (d.length == 0) {
-        Department.findByIdAndRemove({ _id: req.params.id }, function(
+        Department.findByIdAndRemove({ _id: req.params.id }, function (
           err,
           department
         ) {
@@ -874,7 +880,7 @@ app.delete("/api/department/:id", verifyAdminHR, (req, res) => {
 app.get("/api/admin/portal", verifyAdmin, (req, res) => {
   Portal.find()
     .populate({ path: "projects" })
-    .exec(function(err, portalData) {
+    .exec(function (err, portalData) {
       if (err) {
         res.send("err");
         console.log(err);
@@ -895,7 +901,7 @@ app.post("/api/admin/portal", verifyAdmin, (req, res) => {
         Status: req.body.Status
       };
 
-      Portal.create(newPortal, function(err, portalData) {
+      Portal.create(newPortal, function (err, portalData) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -920,7 +926,7 @@ app.put("/api/admin/portal/:id", verifyAdmin, (req, res) => {
         PortalName: req.body.PortalName,
         Status: req.body.Status
       };
-      Portal.findByIdAndUpdate(req.body._id, updatePortal, function(
+      Portal.findByIdAndUpdate(req.body._id, updatePortal, function (
         err,
         Portal
       ) {
@@ -938,11 +944,11 @@ app.put("/api/admin/portal/:id", verifyAdmin, (req, res) => {
 });
 
 app.delete("/api/admin/portal/:id", verifyAdmin, (req, res) => {
-  Portal.findByIdAndRemove({ _id: req.params.id }, function(err, portal) {
+  Portal.findByIdAndRemove({ _id: req.params.id }, function (err, portal) {
     if (!err) {
       console.log("portal deleted");
       res.send(portal);
-      Project.deleteMany({ portals: { _id: portal._id } }, function(err) {
+      Project.deleteMany({ portals: { _id: portal._id } }, function (err) {
         if (err) {
           res.send("error");
           console.log(err);
@@ -965,7 +971,7 @@ app.get("/api/admin/project-bid", verifyAdmin, (req, res) => {
 
   Project.find()
     .populate("portals")
-    .exec(function(err, project) {
+    .exec(function (err, project) {
       if (err) {
         console.log(err);
         res.send("err");
@@ -993,7 +999,7 @@ app.post("/api/admin/project-bid", verifyAdmin, (req, res) => {
         Status: req.body.Status,
         Remark: req.body.Remark
       };
-      Project.create(project, function(err, project) {
+      Project.create(project, function (err, project) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -1026,7 +1032,7 @@ app.put("/api/admin/project-bid/:id", verifyAdmin, (req, res) => {
         Remark: req.body.Remark
       };
 
-      Project.findByIdAndUpdate(req.params.id, updateProject, function(
+      Project.findByIdAndUpdate(req.params.id, updateProject, function (
         err,
         Project
       ) {
@@ -1044,7 +1050,7 @@ app.put("/api/admin/project-bid/:id", verifyAdmin, (req, res) => {
 });
 
 app.delete("/api/admin/project-bid/:id", verifyAdmin, (req, res) => {
-  Project.findByIdAndRemove({ _id: req.params.id }, function(err, project) {
+  Project.findByIdAndRemove({ _id: req.params.id }, function (err, project) {
     if (err) {
       console.log("error");
       res.send("err");
@@ -1064,7 +1070,7 @@ app.delete("/api/admin/project-bid/:id", verifyAdmin, (req, res) => {
 app.get("/api/country", verifyHR, (req, res) => {
   Country.find()
     .populate({ path: "states", populate: { path: "cities" } })
-    .exec(function(err, country) {
+    .exec(function (err, country) {
       res.send(country);
     });
 });
@@ -1081,7 +1087,7 @@ app.post("/api/country", verifyHR, (req, res) => {
         CountryName: req.body.CountryName
       };
 
-      Country.create(newCountry, function(err, country) {
+      Country.create(newCountry, function (err, country) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -1106,7 +1112,7 @@ app.put("/api/country/:id", verifyHR, (req, res) => {
       newCountry = {
         CountryName: req.body.CountryName
       };
-      Country.findByIdAndUpdate(req.params.id, newCountry, function(
+      Country.findByIdAndUpdate(req.params.id, newCountry, function (
         err,
         country
       ) {
@@ -1124,7 +1130,7 @@ app.put("/api/country/:id", verifyHR, (req, res) => {
 });
 
 app.delete("/api/country/:id", verifyHR, (req, res) => {
-  Country.findById(req.params.id, function(err, foundCountry) {
+  Country.findById(req.params.id, function (err, foundCountry) {
     if (err) {
       res.send(err);
     } else {
@@ -1136,12 +1142,12 @@ app.delete("/api/country/:id", verifyHR, (req, res) => {
             "First Delete All The states in this country before deleting this country"
           );
       } else {
-        Country.findByIdAndRemove({ _id: req.params.id }, function(
+        Country.findByIdAndRemove({ _id: req.params.id }, function (
           err,
           country
         ) {
           if (!err) {
-            State.deleteMany({ country: { _id: req.params.id } }, function(
+            State.deleteMany({ country: { _id: req.params.id } }, function (
               err
             ) {
               if (err) {
@@ -1150,7 +1156,7 @@ app.delete("/api/country/:id", verifyHR, (req, res) => {
               } else {
                 City.deleteMany(
                   { state: { country: { _id: req.params.id } } },
-                  function(err) {
+                  function (err) {
                     if (err) {
                       console.log(err);
                       res.send("error");
@@ -1178,7 +1184,7 @@ app.delete("/api/country/:id", verifyHR, (req, res) => {
 app.get("/api/state", verifyHR, (req, res) => {
   State.find()
     .populate("country citiesx")
-    .exec(function(err, country) {
+    .exec(function (err, country) {
       res.send(country);
     });
 });
@@ -1196,18 +1202,18 @@ app.post("/api/state", verifyHR, (req, res) => {
         country: req.body.CountryID
       };
 
-      State.create(newState, function(err, state) {
+      State.create(newState, function (err, state) {
         if (err) {
           console.log(err);
           res.send("error");
         } else {
-          Country.findById(req.body.CountryID, function(err, country) {
+          Country.findById(req.body.CountryID, function (err, country) {
             if (err) {
               console.log(err);
               res.send("err");
             } else {
               country.states.push(state);
-              country.save(function(err, data) {
+              country.save(function (err, data) {
                 if (err) {
                   console.log(err);
                   res.send("err");
@@ -1240,7 +1246,7 @@ app.put("/api/state/:id", verifyHR, (req, res) => {
         country: req.body.CountryID
       };
 
-      State.findByIdAndUpdate(req.params.id, newState, function(err, state) {
+      State.findByIdAndUpdate(req.params.id, newState, function (err, state) {
         if (err) {
           res.send("error");
         } else {
@@ -1255,7 +1261,7 @@ app.put("/api/state/:id", verifyHR, (req, res) => {
 });
 
 app.delete("/api/state/:id", verifyHR, (req, res) => {
-  State.findById(req.params.id, function(err, foundState) {
+  State.findById(req.params.id, function (err, foundState) {
     if (err) {
       res.send(err);
     } else {
@@ -1267,14 +1273,14 @@ app.delete("/api/state/:id", verifyHR, (req, res) => {
             "First Delete All The cities in this state before deleting this state"
           );
       } else {
-        State.findByIdAndRemove({ _id: req.params.id }, function(err, state) {
+        State.findByIdAndRemove({ _id: req.params.id }, function (err, state) {
           if (!err) {
             console.log(" state deleted");
             console.log("country id---------", state.country[0]);
             Country.update(
               { _id: state.country[0] },
               { $pull: { states: state._id } },
-              function(err, numberAffected) {
+              function (err, numberAffected) {
                 console.log(numberAffected);
                 res.send(state);
               }
@@ -1297,7 +1303,7 @@ app.delete("/api/state/:id", verifyHR, (req, res) => {
 app.get("/api/city", verifyHR, (req, res) => {
   City.find()
     .populate({ path: "state", populate: { path: "country" } })
-    .exec(function(err, city) {
+    .exec(function (err, city) {
       // employee = employees;
       res.send(city);
     });
@@ -1315,18 +1321,18 @@ app.post("/api/city", verifyHR, (req, res) => {
         state: req.body.StateID
       };
 
-      City.create(newCity, function(err, city) {
+      City.create(newCity, function (err, city) {
         if (err) {
           console.log(err);
           res.send("error");
         } else {
-          State.findById(req.body.StateID, function(err, state) {
+          State.findById(req.body.StateID, function (err, state) {
             if (err) {
               console.log(err);
               res.send("err");
             } else {
               state.cities.push(city);
-              state.save(function(err, data) {
+              state.save(function (err, data) {
                 if (err) {
                   console.log(err);
                   res.send("err");
@@ -1358,7 +1364,7 @@ app.put("/api/city/:id", verifyHR, (req, res) => {
         state: req.body.StateID
       };
 
-      City.findByIdAndUpdate(req.params.id, newCity, function(err, city) {
+      City.findByIdAndUpdate(req.params.id, newCity, function (err, city) {
         if (err) {
           res.send("error");
         } else {
@@ -1373,20 +1379,20 @@ app.put("/api/city/:id", verifyHR, (req, res) => {
 });
 
 app.delete("/api/city/:id", verifyHR, (req, res) => {
-  Company.find({ city: req.params.id }, function(err, country) {
+  Company.find({ city: req.params.id }, function (err, country) {
     if (err) {
       console.log(err);
       res.send(err);
     } else {
       console.log(country.length == 0);
       if (country.length == 0) {
-        City.findByIdAndRemove({ _id: req.params.id }, function(err, city) {
+        City.findByIdAndRemove({ _id: req.params.id }, function (err, city) {
           if (!err) {
             console.log(" state deleted");
             State.update(
               { _id: city.state[0] },
               { $pull: { cities: city._id } },
-              function(err, numberAffected) {
+              function (err, numberAffected) {
                 console.log(numberAffected);
                 res.send(city);
               }
@@ -1429,7 +1435,7 @@ app.get("/api/company", verifyAdminHR, (req, res) => {
         }
       }
     })
-    .exec(function(err, compnay) {
+    .exec(function (err, compnay) {
       res.send(compnay);
     });
 });
@@ -1456,7 +1462,7 @@ app.post("/api/company", verifyHR, (req, res) => {
         CINNo: req.body.CINNo
       };
 
-      Company.create(newCompany, function(err, company) {
+      Company.create(newCompany, function (err, company) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -1492,7 +1498,7 @@ app.put("/api/company/:id", verifyHR, (req, res) => {
         CINNo: req.body.CINNo
       };
 
-      Company.findByIdAndUpdate(req.params.id, newCompany, function(
+      Company.findByIdAndUpdate(req.params.id, newCompany, function (
         err,
         company
       ) {
@@ -1527,7 +1533,7 @@ app.get("/api/employee", verifyHR, (req, res) => {
       // }
     })
     .select("-salary -education -familyInfo -workExperience -Password")
-    .exec(function(err, employee) {
+    .exec(function (err, employee) {
       res.send(employee);
     });
 });
@@ -1558,7 +1564,7 @@ app.post("/api/employee", verifyHR, (req, res) => {
         TerminateDate: req.body.TerminateDate
       };
 
-      Employee.create(newEmployee, function(err, employee) {
+      Employee.create(newEmployee, function (err, employee) {
         if (err) {
           console.log(err);
           res.send("error");
@@ -1598,7 +1604,7 @@ app.put("/api/employee/:id", verifyHR, (req, res) => {
         TerminateDate: req.body.TerminateDate
       };
 
-      Employee.findByIdAndUpdate(req.params.id, newEmployee, function(
+      Employee.findByIdAndUpdate(req.params.id, newEmployee, function (
         err,
         employee
       ) {
@@ -1616,7 +1622,7 @@ app.put("/api/employee/:id", verifyHR, (req, res) => {
 });
 
 app.delete("/api/Employee/:id", verifyHR, (req, res) => {
-  Employee.findByIdAndRemove({ _id: req.params.id }, function(err, employee) {
+  Employee.findByIdAndRemove({ _id: req.params.id }, function (err, employee) {
     if (!err) {
       console.log(" state deleted");
       res.send(employee);
@@ -1649,7 +1655,7 @@ app.get("/api/salary", verifyHR, (req, res) => {
     })
     // .select(" -role -position -department")
     .select("FirstName LastName MiddleName")
-    .exec(function(err, company) {
+    .exec(function (err, company) {
       // employee = employees;
       let filteredCompany = company.filter(data => data["salary"].length == 1);
       // console.log(filteredCompany);
@@ -1663,7 +1669,7 @@ app.post("/api/salary/:id", verifyHR, (req, res) => {
       console.log(err);
       res.status(400).send(err.details[0].message);
     } else {
-      Employee.findById(req.params.id, function(err, employee) {
+      Employee.findById(req.params.id, function (err, employee) {
         if (err) {
           console.log(err);
           res.send("err");
@@ -1680,13 +1686,13 @@ app.post("/api/salary/:id", verifyHR, (req, res) => {
               TaxDeduction: req.body.TaxDeduction
             };
 
-            Salary.create(newSalary, function(err, salary) {
+            Salary.create(newSalary, function (err, salary) {
               if (err) {
                 console.log(err);
                 res.send("error");
               } else {
                 employee.salary.push(salary);
-                employee.save(function(err, data) {
+                employee.save(function (err, data) {
                   if (err) {
                     console.log(err);
                     res.send("err");
@@ -1727,7 +1733,7 @@ app.put("/api/salary/:id", verifyHR, (req, res) => {
         TaxDeduction: req.body.TaxDeduction
       };
 
-      Salary.findByIdAndUpdate(req.params.id, newSalary, function(err, salary) {
+      Salary.findByIdAndUpdate(req.params.id, newSalary, function (err, salary) {
         if (err) {
           res.send("error");
         } else {
@@ -1742,13 +1748,13 @@ app.put("/api/salary/:id", verifyHR, (req, res) => {
 });
 
 app.delete("/api/salary/:id", verifyHR, (req, res) => {
-  Employee.findById({ _id: req.params.id }, function(err, employee) {
+  Employee.findById({ _id: req.params.id }, function (err, employee) {
     console.log("uuuuuuuunnnnnnnnnnnnnnndef", employee.salary[0]);
     if (err) {
       res.send("error");
       console.log(err);
     } else {
-      Salary.findByIdAndRemove({ _id: employee.salary[0] }, function(
+      Salary.findByIdAndRemove({ _id: employee.salary[0] }, function (
         err,
         salary
       ) {
@@ -1757,7 +1763,7 @@ app.delete("/api/salary/:id", verifyHR, (req, res) => {
           Employee.update(
             { _id: req.params.id },
             { $pull: { salary: employee.salary[0] } },
-            function(err, numberAffected) {
+            function (err, numberAffected) {
               console.log(numberAffected);
               res.send(salary);
             }
@@ -1798,7 +1804,7 @@ app.get("/api/personal-info/:id", verifyHREmployee, (req, res) => {
       //   // }
     })
     .select("-salary -education -familyInfo -workExperience")
-    .exec(function(err, employee) {
+    .exec(function (err, employee) {
       // employee = employees;
       res.send(employee);
     });
@@ -1829,7 +1835,7 @@ app.put("/api/personal-info/:id", verifyEmployee, (req, res) => {
         {
           $set: newEmployee
         },
-        function(err, numberAffected) {
+        function (err, numberAffected) {
           console.log(numberAffected);
           res.send(newEmployee);
         }
@@ -1862,7 +1868,7 @@ app.get("/api/education/:id", verifyHREmployee, (req, res) => {
     })
     // .select(" -role -position -department")
     .select("FirstName LastName MiddleName")
-    .exec(function(err, employee) {
+    .exec(function (err, employee) {
       // console.log(filteredCompany);
       res.send(employee);
     });
@@ -1874,7 +1880,7 @@ app.post("/api/education/:id", verifyEmployee, (req, res) => {
       console.log(err);
       res.status(400).send(err.details[0].message);
     } else {
-      Employee.findById(req.params.id, function(err, employee) {
+      Employee.findById(req.params.id, function (err, employee) {
         if (err) {
           console.log(err);
           res.send("err");
@@ -1888,13 +1894,13 @@ app.post("/api/education/:id", verifyEmployee, (req, res) => {
             PassingOfYear: req.body.PassingOfYear
           };
 
-          Education.create(newEducation, function(err, education) {
+          Education.create(newEducation, function (err, education) {
             if (err) {
               console.log(err);
               res.send("error");
             } else {
               employee.education.push(education);
-              employee.save(function(err, data) {
+              employee.save(function (err, data) {
                 if (err) {
                   console.log(err);
                   res.send("err");
@@ -1928,7 +1934,7 @@ app.put("/api/education/:id", verifyEmployee, (req, res) => {
         PassingOfYear: req.body.PassingOfYear
       };
 
-      Education.findByIdAndUpdate(req.params.id, newEducation, function(
+      Education.findByIdAndUpdate(req.params.id, newEducation, function (
         err,
         education
       ) {
@@ -1945,12 +1951,12 @@ app.put("/api/education/:id", verifyEmployee, (req, res) => {
 });
 
 app.delete("/api/education/:id/:id2", verifyEmployee, (req, res) => {
-  Employee.findById({ _id: req.params.id }, function(err, employee) {
+  Employee.findById({ _id: req.params.id }, function (err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
     } else {
-      Education.findByIdAndRemove({ _id: req.params.id2 }, function(
+      Education.findByIdAndRemove({ _id: req.params.id2 }, function (
         err,
         education
       ) {
@@ -1959,7 +1965,7 @@ app.delete("/api/education/:id/:id2", verifyEmployee, (req, res) => {
           Employee.update(
             { _id: req.params.id },
             { $pull: { education: req.params.id2 } },
-            function(err, numberAffected) {
+            function (err, numberAffected) {
               console.log(numberAffected);
               res.send(education);
             }
@@ -1996,7 +2002,7 @@ app.get("/api/family-info/:id", verifyHREmployee, (req, res) => {
     })
     // .select(" -role -position -department")
     .select("FirstName LastName MiddleName")
-    .exec(function(err, employee) {
+    .exec(function (err, employee) {
       // console.log(filteredCompany);
       res.send(employee);
     });
@@ -2008,7 +2014,7 @@ app.post("/api/family-info/:id", verifyEmployee, (req, res) => {
       console.log(err);
       res.status(400).send(err.details[0].message);
     } else {
-      Employee.findById(req.params.id, function(err, employee) {
+      Employee.findById(req.params.id, function (err, employee) {
         if (err) {
           console.log(err);
           res.send("err");
@@ -2022,13 +2028,13 @@ app.post("/api/family-info/:id", verifyEmployee, (req, res) => {
             Occupation: req.body.Occupation
           };
 
-          FamilyInfo.create(newFamilyInfo, function(err, familyInfo) {
+          FamilyInfo.create(newFamilyInfo, function (err, familyInfo) {
             if (err) {
               console.log(err);
               res.send("error");
             } else {
               employee.familyInfo.push(familyInfo);
-              employee.save(function(err, data) {
+              employee.save(function (err, data) {
                 if (err) {
                   console.log(err);
                   res.send("err");
@@ -2062,7 +2068,7 @@ app.put("/api/family-info/:id", verifyEmployee, (req, res) => {
         Occupation: req.body.Occupation
       };
 
-      FamilyInfo.findByIdAndUpdate(req.params.id, newFamilyInfo, function(
+      FamilyInfo.findByIdAndUpdate(req.params.id, newFamilyInfo, function (
         err,
         familyInfo
       ) {
@@ -2079,12 +2085,12 @@ app.put("/api/family-info/:id", verifyEmployee, (req, res) => {
 });
 
 app.delete("/api/family-info/:id/:id2", verifyEmployee, (req, res) => {
-  Employee.findById({ _id: req.params.id }, function(err, employee) {
+  Employee.findById({ _id: req.params.id }, function (err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
     } else {
-      FamilyInfo.findByIdAndRemove({ _id: req.params.id2 }, function(
+      FamilyInfo.findByIdAndRemove({ _id: req.params.id2 }, function (
         err,
         familyInfo
       ) {
@@ -2093,7 +2099,7 @@ app.delete("/api/family-info/:id/:id2", verifyEmployee, (req, res) => {
           Employee.update(
             { _id: req.params.id },
             { $pull: { familyInfo: req.params.id2 } },
-            function(err, numberAffected) {
+            function (err, numberAffected) {
               console.log(numberAffected);
               res.send(familyInfo);
             }
@@ -2130,7 +2136,7 @@ app.get("/api/work-experience/:id", verifyHREmployee, (req, res) => {
     })
     // .select(" -role -position -department")
     .select("FirstName LastName MiddleName")
-    .exec(function(err, employee) {
+    .exec(function (err, employee) {
       res.send(employee);
     });
 });
@@ -2141,7 +2147,7 @@ app.post("/api/work-experience/:id", verifyEmployee, (req, res) => {
       console.log(err);
       res.status(400).send(err.details[0].message);
     } else {
-      Employee.findById(req.params.id, function(err, employee) {
+      Employee.findById(req.params.id, function (err, employee) {
         if (err) {
           console.log(err);
           res.send("err");
@@ -2155,7 +2161,7 @@ app.post("/api/work-experience/:id", verifyEmployee, (req, res) => {
             ToDate: req.body.ToDate
           };
 
-          WorkExperience.create(newWorkExperience, function(
+          WorkExperience.create(newWorkExperience, function (
             err,
             workExperience
           ) {
@@ -2164,7 +2170,7 @@ app.post("/api/work-experience/:id", verifyEmployee, (req, res) => {
               res.send("error");
             } else {
               employee.workExperience.push(workExperience);
-              employee.save(function(err, data) {
+              employee.save(function (err, data) {
                 if (err) {
                   console.log(err);
                   res.send("err");
@@ -2201,7 +2207,7 @@ app.put("/api/work-experience/:id", verifyEmployee, (req, res) => {
       WorkExperience.findByIdAndUpdate(
         req.params.id,
         newWorkExperience,
-        function(err, workExperience) {
+        function (err, workExperience) {
           if (err) {
             res.send("error");
           } else {
@@ -2216,12 +2222,12 @@ app.put("/api/work-experience/:id", verifyEmployee, (req, res) => {
 });
 
 app.delete("/api/Work-experience/:id/:id2", verifyEmployee, (req, res) => {
-  Employee.findById({ _id: req.params.id }, function(err, employee) {
+  Employee.findById({ _id: req.params.id }, function (err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
     } else {
-      WorkExperience.findByIdAndRemove({ _id: req.params.id2 }, function(
+      WorkExperience.findByIdAndRemove({ _id: req.params.id2 }, function (
         err,
         workExperience
       ) {
@@ -2230,7 +2236,7 @@ app.delete("/api/Work-experience/:id/:id2", verifyEmployee, (req, res) => {
           Employee.update(
             { _id: req.params.id },
             { $pull: { workExperience: req.params.id2 } },
-            function(err, numberAffected) {
+            function (err, numberAffected) {
               console.log(numberAffected);
               res.send(workExperience);
             }
@@ -2267,7 +2273,7 @@ app.get("/api/leave-application-emp/:id", verifyEmployee, (req, res) => {
     })
     // .select(" -role -position -department")
     .select("FirstName LastName MiddleName")
-    .exec(function(err, employee) {
+    .exec(function (err, employee) {
       // console.log(filteredCompany);
       if (err) {
         console.log(err);
@@ -2284,7 +2290,7 @@ app.post("/api/leave-application-emp/:id", verifyEmployee, (req, res) => {
       console.log(err);
       res.status(400).send(err.details[0].message);
     } else {
-      Employee.findById(req.params.id, function(err, employee) {
+      Employee.findById(req.params.id, function (err, employee) {
         if (err) {
           console.log(err);
           res.send("err");
@@ -2299,7 +2305,7 @@ app.post("/api/leave-application-emp/:id", verifyEmployee, (req, res) => {
             employee: req.params.id
           };
 
-          LeaveApplication.create(newLeaveApplication, function(
+          LeaveApplication.create(newLeaveApplication, function (
             err,
             leaveApplication
           ) {
@@ -2308,7 +2314,7 @@ app.post("/api/leave-application-emp/:id", verifyEmployee, (req, res) => {
               res.send("error");
             } else {
               employee.leaveApplication.push(leaveApplication);
-              employee.save(function(err, data) {
+              employee.save(function (err, data) {
                 if (err) {
                   console.log(err);
                   res.send("err");
@@ -2347,7 +2353,7 @@ app.put("/api/leave-application-emp/:id", verifyEmployee, (req, res) => {
       LeaveApplication.findByIdAndUpdate(
         req.params.id,
         newLeaveApplication,
-        function(err, leaveApplication) {
+        function (err, leaveApplication) {
           if (err) {
             res.send("error");
           } else {
@@ -2365,12 +2371,12 @@ app.delete(
   "/api/leave-application-emp/:id/:id2",
   verifyEmployee,
   (req, res) => {
-    Employee.findById({ _id: req.params.id }, function(err, employee) {
+    Employee.findById({ _id: req.params.id }, function (err, employee) {
       if (err) {
         res.send("error");
         console.log(err);
       } else {
-        LeaveApplication.findByIdAndRemove({ _id: req.params.id2 }, function(
+        LeaveApplication.findByIdAndRemove({ _id: req.params.id2 }, function (
           err,
           leaveApplication
         ) {
@@ -2379,7 +2385,7 @@ app.delete(
             Employee.update(
               { _id: req.params.id },
               { $pull: { leaveApplication: req.params.id2 } },
-              function(err, numberAffected) {
+              function (err, numberAffected) {
                 console.log(numberAffected);
                 res.send(leaveApplication);
               }
@@ -2409,7 +2415,7 @@ app.get("/api/leave-application-hr", verifyHR, (req, res) => {
     // .select(" -role -position -department")
     // .select("FirstName LastName MiddleName"
     // )
-    .exec(function(err, leaveApplication) {
+    .exec(function (err, leaveApplication) {
       // console.log(filteredCompany);
       if (err) {
         console.log(err);
@@ -2436,7 +2442,7 @@ app.put("/api/leave-application-hr/:id", verifyHR, (req, res) => {
         {
           $set: newLeaveApplication
         },
-        function(err, numberAffected) {
+        function (err, numberAffected) {
           console.log(numberAffected);
           res.send(newLeaveApplication);
         }
@@ -2448,12 +2454,12 @@ app.put("/api/leave-application-hr/:id", verifyHR, (req, res) => {
 });
 
 app.delete("/api/leave-application-hr/:id/:id2", verifyHR, (req, res) => {
-  Employee.findById({ _id: req.params.id }, function(err, employee) {
+  Employee.findById({ _id: req.params.id }, function (err, employee) {
     if (err) {
       res.send("error");
       console.log(err);
     } else {
-      LeaveApplication.findByIdAndRemove({ _id: req.params.id2 }, function(
+      LeaveApplication.findByIdAndRemove({ _id: req.params.id2 }, function (
         err,
         leaveApplication
       ) {
@@ -2462,7 +2468,7 @@ app.delete("/api/leave-application-hr/:id/:id2", verifyHR, (req, res) => {
           Employee.update(
             { _id: req.params.id },
             { $pull: { leaveApplication: req.params.id2 } },
-            function(err, numberAffected) {
+            function (err, numberAffected) {
               console.log(numberAffected);
               res.send(leaveApplication);
             }
@@ -2500,7 +2506,7 @@ app.post("/api/login", (req, res) => {
         Employee.findOne(
           { Email: req.body.email },
           "Password _id Account FirstName LastName",
-          function(err, document) {
+          function (err, document) {
             if (err || document == null) {
               res.send("false");
             } else {
@@ -2511,7 +2517,7 @@ app.post("/api/login", (req, res) => {
                   FirstName: document.FirstName,
                   LastName: document.LastName
                 };
-                var token = jwt.sign(emp, jwtKey.jwtKey);
+                var token = jwt.sign(emp, jwtKey);
                 res.send(token);
               } else {
                 res.sendStatus(400);
@@ -2533,7 +2539,7 @@ function verifyAdmin(req, res, next) {
   if (typeof Header !== "undefined") {
     // decodedData = jwt.decode(req.headers['authorization']);
     // if(decodedData.Account)
-    jwt.verify(Header, jwtKey.jwtKey, (err, authData) => {
+    jwt.verify(Header, jwtKey, (err, authData) => {
       if (err) {
         res.sendStatus(403);
       } else {
@@ -2557,7 +2563,7 @@ function verifyAdminHR(req, res, next) {
   if (typeof Header !== "undefined") {
     // decodedData = jwt.decode(req.headers['authorization']);
     // if(decodedData.Account)
-    jwt.verify(Header, jwtKey.jwtKey, (err, authData) => {
+    jwt.verify(Header, jwtKey, (err, authData) => {
       if (err) {
         res.sendStatus(403);
       } else {
@@ -2581,7 +2587,7 @@ function verifyHR(req, res, next) {
   if (typeof Header !== "undefined") {
     // decodedData = jwt.decode(req.headers['authorization']);
     // if(decodedData.Account)
-    jwt.verify(Header, jwtKey.jwtKey, (err, authData) => {
+    jwt.verify(Header, jwtKey, (err, authData) => {
       if (err) {
         res.sendStatus(403);
       } else {
@@ -2605,26 +2611,26 @@ function verifyHREmployee(req, res, next) {
   if (typeof Header !== "undefined") {
     // decodedData = jwt.decode(req.headers['authorization']);
     // if(decodedData.Account)
-    jwt.verify(Header, jwtKey.jwtKey, (err, authData) => {
+    jwt.verify(Header, jwtKey, (err, authData) => {
       if (err) {
         res.sendStatus(403);
       } else {
         console.log(authData);
         if (authData.Account == 2) {
           next();
-        } else if(authData.Account == 3){
-          if(authData._id == req.params.id){
+        } else if (authData.Account == 3) {
+          if (authData._id == req.params.id) {
 
 
             next();
           }
-          else{
-          res.sendStatus(403);
+          else {
+            res.sendStatus(403);
 
           }
-          
 
-        }else {
+
+        } else {
           res.sendStatus(403);
         }
       }
@@ -2641,7 +2647,7 @@ function verifyEmployee(req, res, next) {
   if (typeof Header !== "undefined") {
     // decodedData = jwt.decode(req.headers['authorization']);
     // if(decodedData.Account)
-    jwt.verify(Header, jwtKey.jwtKey, (err, authData) => {
+    jwt.verify(Header, jwtKey, (err, authData) => {
       if (err) {
         res.sendStatus(403);
       } else {
