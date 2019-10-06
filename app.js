@@ -14,11 +14,11 @@ if (!process.env.DATABASEURL) {
   mongoURI = process.env.DATABASEURL;
 }
 //seting up jwt token
-if (!process.env.JWTTOKEN) {
+if (!process.env.JWTKEY) {
   var jwtKey = require("./jwtKey.js").jwtKey;
 
 } else {
-  jwtKey = process.env.JWTTOKEN;
+  jwtKey = process.env.JWTKEY;
 }
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
