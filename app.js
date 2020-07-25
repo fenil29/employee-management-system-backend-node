@@ -1623,7 +1623,7 @@ app.put("/api/employee/:id", verifyHR, (req, res) => {
       let newEmployee;
       newEmployee = {
         Email: req.body.Email,
-        Password: req.body.Password,
+        // Password: req.body.Password,
         Account: req.body.Account,
         role: req.body.RoleID,
         Gender: req.body.Gender,
