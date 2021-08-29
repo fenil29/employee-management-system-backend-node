@@ -2699,8 +2699,8 @@ function verifyEmployee(req, res, next) {
 }
 
 var port = process.env.PORT;
-if (process.env.PORT) {
-  app.listen(process.env.PORT, process.env.IP, () => {
+if (port & process.env.IP) {
+  app.listen(port, process.env.IP, () => {
     console.log("started");
   });
 } else
