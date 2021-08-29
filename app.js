@@ -4,22 +4,15 @@ var express = require("express"),
   Joi = require("joi"),
   app = express();
 jwt = require("jsonwebtoken");
+require('dotenv').config()
+
 
 //connecting to mongodb
-let mongoURI;
-if (!process.env.DATABASEURL) {
-  var config = require("./config.js");
-  mongoURI = config.DATABASEURL;
-} else {
-  mongoURI = process.env.DATABASEURL;
-}
+let mongoURI = process.env.DATABASEURL;
 //seting up jwt token
-if (!process.env.JWTKEY) {
-  var jwtKey = require("./jwtKey.js").jwtKey;
+let jwtKey = process.env.JWTKEY;
 
-} else {
-  jwtKey = process.env.JWTKEY;
-}
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
@@ -2705,7 +2698,7 @@ function verifyEmployee(req, res, next) {
   }
 }
 
-var port = 4000;
+var port = process.env.PORT;
 if (process.env.PORT) {
   app.listen(process.env.PORT, process.env.IP, () => {
     console.log("started");
