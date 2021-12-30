@@ -48,7 +48,7 @@ The different part or module of this project is as follows:
 Example of .env file (this file is present with the name .envexample):
 ```
 PORT=4000
-DATABASEURL=mongodb+srv://username:password@cluster0-oazgl.mongodb.net/test?retryWrites=true
+DATABASEURL=mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
 JWTKEY=set_your_jwt_key
 ```
 (note: Here I am using mondo DB atlas which provides a free cloud-based database so you can paste the URL provided by the atlas or you can install your own database)
