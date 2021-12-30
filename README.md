@@ -52,6 +52,7 @@ DATABASEURL=mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[def
 JWTKEY=set_your_jwt_key
 ```
 (note: Here I am using mondo DB atlas which provides a free cloud-based database so you can paste the URL provided by the atlas or you can install your own database)
+More Information about the MongoDB connection string : https://docs.mongodb.com/manual/reference/connection-string/
 * run both projects with the `npm start` command
 
 
