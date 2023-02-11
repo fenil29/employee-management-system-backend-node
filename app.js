@@ -619,6 +619,15 @@ const CompanyValidation = Joi.object().keys({
   Deleted: Joi.optional()
 });
 
+app.get("/", (req, res) => {
+  res.send("employee management system API 😀");
+});
+
+app.get("/api", (req, res) => {
+  res.send("employee management system API 😀");
+});
+
+app.p
 app.get("/api/role", verifyAdminHR, (req, res) => {
   Role.find()
     .populate("company")
